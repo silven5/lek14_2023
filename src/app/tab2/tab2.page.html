@@ -1,0 +1,14 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Users
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-button (click)="view()">Перегляд користувачів</ion-button>
+  <ion-item *ngFor="let item of res ">
+    {{item}}
+  </ion-item>
+</ion-content>
