@@ -7,12 +7,11 @@ import { IUser } from './interface/iuser';
 import { Route } from '@angular/router';
 export const Storage = Preferences;
 export const TOKEN_KEY = 'user-token';
-export const ROLE=["ADMIN","USER"];
+export const ROLE = ['ADMIN', 'USER'];
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
- 
   // !простий вхід
   constructor() {
     this.loadUser();
@@ -27,78 +26,62 @@ export class AuthService {
     this.isLoggedIn = false;
   }
 
- 
-   
   private currenteUser: BehaviorSubject<any> = new BehaviorSubject(null);
-   // Читання користувачів з локального сховища
+  // Читання користувачів з локального сховища
   loadUser() {
-    Storage.get({key:TOKEN_KEY}).then(res=>{
-      if (res.value)
-      {
+    Storage.get({ key: TOKEN_KEY }).then((res) => {
+      if (res.value) {
         this.currenteUser.next(JSON.parse(res.value));
-      }
-      else
-      {
+      } else {
         this.currenteUser.next(false);
       }
-    }
-      );
+    });
   }
   // Вхід
-  signIn(role:string)
-  {
-    let userObj:IUser|undefined;
-    if (role===ROLE[1])
-    {
-      userObj={
-      
-        role:ROLE[1],
-        permissions:["read"],
-         users:[
+  signIn(role: string) {
+    let userObj: IUser | undefined;
+    if (role === ROLE[1]) {
+      userObj = {
+        role: ROLE[1],
+        permissions: ['read'],
+        users: [
           {
-            name:"Alex",
-            password:"1"
+            name: 'Alex',
+            password: '1',
           },
-        ]
+        ],
+      };
+    } else {
+      if (role === ROLE[0]) {
+        userObj = {
+          role: ROLE[0],
+          permissions: ['read', 'write', 'delete'],
+          users: [
+            {
+              name: 'Olena',
+              password: '1',
+            },
+          ],
+        };
       }
     }
-    else
-    {
-       if (role===ROLE[0])
-    {
-      userObj={
-      
-        role:ROLE[0],
-        permissions:["read","write"],
-        users:[
-          {
-            name:"Olena",
-            password:"1"
-          },
-        ]
-      }
-    }
-  }
-  // Повертаємо Observable
-  return of(userObj).pipe(
-    tap(user=>
-      {
-        Storage.set({key:TOKEN_KEY,value:JSON.stringify(user)});
+    // Повертаємо Observable
+    return of(userObj).pipe(
+      tap((user) => {
+        Storage.set({ key: TOKEN_KEY, value: JSON.stringify(user) });
         this.currenteUser.next(user);
         // this.login();
-      }))
-}
-// Повертаємо поточного користувача як Observable
-getUser()
-{
-  return this.currenteUser.asObservable();
-}
-// Вихід
-async signOut()
-{
-  await Storage.remove({key:TOKEN_KEY});
-  this.currenteUser.next(false);
- this.logout();
-
-}
+      })
+    );
+  }
+  // Повертаємо поточного користувача як Observable
+  getUser() {
+    return this.currenteUser.asObservable();
+  }
+  // Вихід
+  async signOut() {
+    await Storage.remove({ key: TOKEN_KEY });
+    this.currenteUser.next(false);
+    this.logout();
+  }
 }
